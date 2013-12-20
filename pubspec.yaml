@@ -1,0 +1,4 @@
+name: responsive-design-preview
+dependencies:
+  html5_dnd: any
+  browser: any

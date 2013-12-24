@@ -66,9 +66,11 @@ void createPreview(num x, num y, num w, num h, double scale) {
 }
 
 void headTextClick(Event e) {
-  var parent = (e.target as HtmlElement).parent;
+  var target = (e.target as HtmlElement);
+  var parent = target.parent;
   parent.querySelectorAll("span").style.display = 'none';
   parent.querySelectorAll("input").style.display = 'inline';
+  (parent.querySelector("input." + target.className) as InputElement).select();
 
 
 }

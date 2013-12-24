@@ -8,8 +8,8 @@ num previewCounter = 0;
 
 void main() {
   container = querySelector('#container');
-  querySelector('#refresh').onClick.listen(refreshPreviewContent);
-  querySelector('#url').onChange.listen(refreshPreviewContent);
+  querySelector('#refresh').onClick.listen(onRefreshClick);
+  querySelector('#url').onChange.listen(onRefreshClick);
   createPreview(0, 0, 1024,768,0.5);
   createPreview(520, 0, 320, 480 ,0.8);
   createPreview(0, 420, 1920,1200,0.4);
@@ -17,7 +17,7 @@ void main() {
   if(urlInput.value.isEmpty) {
     urlInput.value = 'http://';
   } else {
-    refreshPreviewContent(null);
+    onRefreshClick(null);
   }
 
   SortableGroup sg = new SortableGroup();
@@ -56,16 +56,16 @@ void createPreview(num x, num y, num w, num h, double scale) {
 
   var spans = querySelectorAll(".preview form span");
   for (HtmlElement span in spans) {
-    span.onClick.listen(headTextClick);
+    span.onClick.listen(onDimensionLabelClick);
   }
   var inputs = querySelectorAll(".preview form input");
   for (HtmlElement input in inputs) {
-    input.onBlur.listen(formBlur);
+    input.onBlur.listen(onDimensionInputBlur);
   }
 
 }
 
-void headTextClick(Event e) {
+void onDimensionLabelClick(Event e) {
   var target = (e.target as HtmlElement);
   var parent = target.parent;
   parent.querySelectorAll("span").style.display = 'none';
@@ -74,7 +74,7 @@ void headTextClick(Event e) {
 
 
 }
-void formBlur(MouseEvent e) {
+void onDimensionInputBlur(MouseEvent e) {
   var target = e.target as HtmlElement;
   target.parent.querySelector('span.${e.currentTarget.className}').text = target.value;
 
@@ -105,7 +105,7 @@ void updatePreviewSize(DivElement previewDiv) {
 }
 
 
-void refreshPreviewContent(Event e) {
+void onRefreshClick(Event e) {
   var iframes = querySelectorAll('iframe');
   for(var i=0; i<iframes.length; i++) {
     iframes[i].setAttribute('src', 'about:blank');

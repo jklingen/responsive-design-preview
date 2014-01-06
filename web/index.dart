@@ -5,6 +5,7 @@ import 'package:html5_dnd/html5_dnd.dart';
 HtmlElement container;
 HtmlElement draggedElement;
 num previewCounter = 0;
+SortableGroup sortableGroup = new SortableGroup();
 
 void main() {
   container = querySelector('#container');
@@ -19,10 +20,8 @@ void main() {
   } else {
     onRefreshClick(null);
   }
-
-  SortableGroup sg = new SortableGroup();
-  sg.installAll(querySelectorAll('.preview'));
-  sg.isGrid = true;
+  sortableGroup.isGrid = true;
+  sortableGroup.installAll(querySelectorAll('.preview'));
 }
 
 
@@ -60,6 +59,10 @@ void createPreview(num x, num y, num w, num h, double scale) {
 
   updatePreviewSize(div);
 
+  registerEvents(div);
+}
+
+void registerEvents(DivElement div) {
   var spans = div.querySelectorAll("form span");
   for (HtmlElement span in spans) {
     span.onClick.listen(onDimensionLabelClick);
@@ -70,6 +73,8 @@ void createPreview(num x, num y, num w, num h, double scale) {
   }
   div.querySelector(".preview-control .close").onClick.listen(onCloseButtonClick);
   div.querySelector(".preview-control .clone").onClick.listen(onCloneButtonClick);
+
+  sortableGroup.install(div);
 }
 
 void onDimensionLabelClick(Event e) {
@@ -78,8 +83,6 @@ void onDimensionLabelClick(Event e) {
   parent.querySelectorAll("span").style.display = 'none';
   parent.querySelectorAll("input").style.display = 'inline';
   (parent.querySelector("input." + target.className) as InputElement).select();
-
-
 }
 
 void onDimensionInputBlur(MouseEvent e) {
@@ -102,7 +105,9 @@ void onCloseButtonClick(Event e) {
 
 void onCloneButtonClick(Event e) {
   var preview = findParentPreview(e.target as HtmlElement);
-  preview.parent.insertBefore(preview.clone(true),preview);
+  DivElement previewDiv = preview.clone(true);
+  preview.parent.insertBefore(previewDiv,preview);
+  registerEvents(previewDiv);
 }
 
 

@@ -37,16 +37,22 @@ void createPreview(num x, num y, num w, num h, double scale) {
   div.style.zIndex = previewCounter;
 
   div.appendHtml('''
-    <form>
-      <h3>
-        <span class="w">$w</span>
+
+      <h3>&nbsp;
+      <form>
+        <span class="w" title="Change width" >$w</span>
         <input type="number" class="w" value="$w" tabindex="${previewCounter*3}"/>x
-        <span class="h">$h</span>
+        <span class="h" title="Change height">$h</span>
         <input type="number" class="h" value="$h" tabindex="${previewCounter*3+1}"/>@
-        <span class="scale">${scale*100}</span>
+        <span class="scale"  title="Change zoom">${scale*100}</span>
         <input type="number" class="scale" value="${scale*100}" tabindex="${previewCounter*3+2}"/>%
+        </form>
+        <div class="preview-control">
+          <span class="flaticon-duplicate1 clone" title="Clone this preview"></span>
+          <span class="flaticon-close12 close" title="Close this preview"></span>
+        </div>
       </h3>
-    </form>''');
+    ''');
 
   div.children.add(new IFrameElement());
 
@@ -54,15 +60,16 @@ void createPreview(num x, num y, num w, num h, double scale) {
 
   updatePreviewSize(div);
 
-  var spans = querySelectorAll(".preview form span");
+  var spans = div.querySelectorAll("form span");
   for (HtmlElement span in spans) {
     span.onClick.listen(onDimensionLabelClick);
   }
-  var inputs = querySelectorAll(".preview form input");
+  var inputs = div.querySelectorAll("form input");
   for (HtmlElement input in inputs) {
     input.onBlur.listen(onDimensionInputBlur);
   }
-
+  div.querySelector(".preview-control .close").onClick.listen(onCloseButtonClick);
+  div.querySelector(".preview-control .clone").onClick.listen(onCloneButtonClick);
 }
 
 void onDimensionLabelClick(Event e) {
@@ -74,6 +81,7 @@ void onDimensionLabelClick(Event e) {
 
 
 }
+
 void onDimensionInputBlur(MouseEvent e) {
   var target = e.target as HtmlElement;
   target.parent.querySelector('span.${e.currentTarget.className}').text = target.value;
@@ -83,11 +91,26 @@ void onDimensionInputBlur(MouseEvent e) {
     parent.querySelectorAll("span").style.display = 'inline';
     parent.querySelectorAll("input").style.display = 'none';
   }
-  DivElement previewDiv = target;
-  while(previewDiv.parent != null && previewDiv.className != 'preview') {
-    previewDiv = previewDiv.parent;
-  }
+  DivElement previewDiv = findParentPreview(target);
   updatePreviewSize(previewDiv);
+}
+
+void onCloseButtonClick(Event e) {
+  var target = (e.target as HtmlElement);
+  findParentPreview(target).remove();
+}
+
+void onCloneButtonClick(Event e) {
+  var preview = findParentPreview(e.target as HtmlElement);
+  preview.parent.insertBefore(preview.clone(true),preview);
+}
+
+
+DivElement findParentPreview(HtmlElement element) {
+  while (element.parent != null && element.className != 'preview') {
+    element = element.parent;
+  }
+  return element;
 }
 
 void updatePreviewSize(DivElement previewDiv) {

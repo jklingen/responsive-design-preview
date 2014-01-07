@@ -47,6 +47,7 @@ void createPreview(num x, num y, num w, num h, double scale) {
         <input type="number" class="scale" value="${scale*100}" tabindex="${previewCounter*3+2}"/>%
         </form>
         <div class="preview-control">
+          <span class="flaticon-arrow67 refresh" title="Refresh this preview"></span>
           <span class="flaticon-duplicate1 clone" title="Clone this preview"></span>
           <span class="flaticon-close12 close" title="Close this preview"></span>
         </div>
@@ -73,6 +74,7 @@ void registerEvents(DivElement div) {
   }
   div.querySelector(".preview-control .close").onClick.listen(onCloseButtonClick);
   div.querySelector(".preview-control .clone").onClick.listen(onCloneButtonClick);
+  div.querySelector(".preview-control .refresh").onClick.listen(onRefreshButtonClick);
 
   sortableGroup.install(div);
 }
@@ -110,6 +112,12 @@ void onCloneButtonClick(Event e) {
   registerEvents(previewDiv);
 }
 
+void onRefreshButtonClick(Event e) {
+  var preview = findParentPreview(e.target as HtmlElement);
+  var ifr = preview.querySelector('iframe');
+  var src = ifr.getAttribute('src');
+  setIframeUrl(ifr, src);
+}
 
 DivElement findParentPreview(HtmlElement element) {
   while (element.parent != null && element.className != 'preview') {
@@ -135,8 +143,15 @@ void updatePreviewSize(DivElement previewDiv) {
 
 void onRefreshClick(Event e) {
   var iframes = querySelectorAll('iframe');
+  var url = (querySelector('#url') as InputElement).value;
   for(var i=0; i<iframes.length; i++) {
-    iframes[i].setAttribute('src', 'about:blank');
-    iframes[i].setAttribute('src', (querySelector('#url') as InputElement).value);
+    setIframeUrl(iframes[i], url);
   }
+}
+
+void setIframeUrl(IFrameElement ifr, String url) {
+  if(ifr.getAttribute('url') == url) { // set blank src before setting original src again, to force refresh
+    ifr.setAttribute('src', 'about:blank');
+  }
+  ifr.setAttribute('src', url);
 }

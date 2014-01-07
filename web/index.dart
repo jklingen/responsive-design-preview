@@ -22,6 +22,8 @@ void main() {
   }
   sortableGroup.isGrid = true;
   sortableGroup.installAll(querySelectorAll('.preview'));
+
+  registerEvents(querySelector('.window.intro'));
 }
 
 
@@ -32,7 +34,7 @@ void createPreview(num x, num y, num w, num h, double scale) {
   var div = new DivElement();
   div
     ..id = 'preview' + previewCounter.toString()
-    ..className = 'preview';
+    ..className = 'preview window';
   div.style.zIndex = previewCounter;
 
   div.appendHtml('''
@@ -96,31 +98,31 @@ void onDimensionInputBlur(MouseEvent e) {
     parent.querySelectorAll("span").style.display = 'inline';
     parent.querySelectorAll("input").style.display = 'none';
   }
-  DivElement previewDiv = findParentPreview(target);
+  DivElement previewDiv = findParentWindow(target);
   updatePreviewSize(previewDiv);
 }
 
 void onCloseButtonClick(Event e) {
   var target = (e.target as HtmlElement);
-  findParentPreview(target).remove();
+  findParentWindow(target).remove();
 }
 
 void onCloneButtonClick(Event e) {
-  var preview = findParentPreview(e.target as HtmlElement);
+  var preview = findParentWindow(e.target as HtmlElement);
   DivElement previewDiv = preview.clone(true);
   preview.parent.insertBefore(previewDiv,preview);
   registerEvents(previewDiv);
 }
 
 void onRefreshButtonClick(Event e) {
-  var preview = findParentPreview(e.target as HtmlElement);
+  var preview = findParentWindow(e.target as HtmlElement);
   var ifr = preview.querySelector('iframe');
   var src = ifr.getAttribute('src');
   setIframeUrl(ifr, src);
 }
 
-DivElement findParentPreview(HtmlElement element) {
-  while (element.parent != null && element.className != 'preview') {
+DivElement findParentWindow(HtmlElement element) {
+  while (element.parent != null && !element.className.contains('window')) {
     element = element.parent;
   }
   return element;
